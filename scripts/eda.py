@@ -142,9 +142,9 @@ def plot_distribution(df: pd.DataFrame, bins: int = 40, title: str = 'Distributi
     plt.tight_layout()
     plt.show()
 
-def plot_rolling_statistics(df: pd.DataFrame, window: int = 24, title: str = 'Rolling Statistics') -> None:
+def plot_rolling_statistics(df: pd.DataFrame, window: int = 12, sampling_interval: pd.Timedelta = pd.Timedelta(minutes=5), title: str = 'Rolling Statistics') -> None:
     """
-    Plots the rolling mean and standard deviation.
+    Plots the rolling mean and standard deviation. Note that if the dataset is sampled every five minutes, adjustments should be made to provide hourly or daily analysis.
     """
 
     _validate_df(df)
@@ -154,15 +154,26 @@ def plot_rolling_statistics(df: pd.DataFrame, window: int = 24, title: str = 'Ro
     rolling_mean = df['value'].rolling(window=window).mean()
     rolling_std = df['value'].rolling(window=window).std()
 
+    # Making a more readable plot title:
+    window_duration = window * sampling_interval
+
+    total_minutes = int(window_duration.total_seconds() // 60)
+    if total_minutes % (24 * 60) == 0:
+        duration_str = f'{total_minutes // (24 * 60)} day(s)'
+    elif total_minutes % 60 == 0:
+        duration_str = f'{total_minutes // 60} hour(s)'
+    else:
+        duration_str = f'{total_minutes} minute(s)'
+
     _, axes = plt.subplots(2, 1, figsize=(12, 6), sharex=True)
 
     axes[0].plot(df['timestamp'], df['value'], linewidth=0.8, label='Value')
-    axes[0].plot(df['timestamp'], rolling_mean, linewidth=2, label=f'Rolling Mean ({window})')
+    axes[0].plot(df['timestamp'], rolling_mean, linewidth=2, label=f'Rolling Mean ({duration_str})')
     axes[0].set_title(f'{title} - Rolling Mean')
     axes[0].set_ylabel('Value')
     axes[0].legend()
 
-    axes[1].plot(df['timestamp'], rolling_std, linewidth=1.5, label=f'Rolling Std ({window})')
+    axes[1].plot(df['timestamp'], rolling_std, linewidth=1.5, label=f'Rolling Std ({duration_str})')
     axes[1].set_title(f'{title} - Rolling Std')
     axes[1].set_xlabel('Timestamp')
     axes[1].set_ylabel('Std')

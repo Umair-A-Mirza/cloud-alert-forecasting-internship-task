@@ -12,11 +12,7 @@ Therefore, although this implementation still focuses on a similar task, it is i
 
 The AWSCloudWatch data provided by **Numenta** contains multiple CSVs, and the following will be used:
 - **CPU_UTIL_1** - ec2_cpu_utilization_5f5533.csv
-- **DISK_WRITE_1** - ec2_disk_write_bytes_c0d644.csv
-- **NETWORK_IN_1** - ec2_network_in_5abac7.csv
-- **REQUEST_COUNT** - elb_request_count_8c0756.csv
-
-The files above include different types of operations and data streams, as the prospective solution should be adaptable.
+- **CPU_UTIL_2** - ec2_cpu_utilization_53ea38.csv
 
 ### Exploratory Data Analysis (EDA)
 
