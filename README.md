@@ -12,11 +12,8 @@ Therefore, although this implementation still focuses on a similar task, it is i
 
 The AWSCloudWatch data provided by **Numenta** contains multiple CSVs, and the following will be used:
 - **CPU_UTIL_1** - ec2_cpu_utilization_5f5533.csv
-- **CPU_UTIL_2** - ec2_cpu_utilization_53ea38.csv
 - **DISK_WRITE_1** - ec2_disk_write_bytes_c0d644.csv
-- **DISK_WRITE_2** - ec2_disk_write_bytes_1ef3de.csv
 - **NETWORK_IN_1** - ec2_network_in_5abac7.csv
-- **NETWORK_IN_2** - ec2_network_in_257a54.csv
 - **REQUEST_COUNT** - elb_request_count_8c0756.csv
 
 The files above include different types of operations and data streams, as the prospective solution should be adaptable.
@@ -55,3 +52,12 @@ This is handled by the following pipeline, each step focused on providing an ove
 
 9. **Anomaly Statistics** - Because the ground truth is defined by anomaly windows, we should note the number of anomaly windows, total anomaly duration, average anomaly duration, number of anomalous points, and fraction of points inside anomaly windows.
     - This will help us understand how rare anomalous behavior is in the dataset, and whether anomalous behavior is short-lived or persists for longer periods of time.
+
+### Relevance of Stationarity
+
+If we were to forecast values with classical approaches, stationarity almost certainly becomes a requirement or implicit assumption with respect to many modeling approaches. In this case, our task is to predict whether an anomaly occurs in the next H time steps when given a time window W. This is a **supervised classification** problem with binary labels, which does not require stationarity with the same strength as other use-cases (e.g. forecasting a value).
+
+Non-stationarity usually indicates elements such as trend changes or drift, which can be common for enterprise cloud data. Increased traffic as operations grow or the deployment of new services can both contribute to dramatic changes in observed cloud metrics, but neither are anomalous. Yet, both of these benign cases will possibly leave a series as non-stationary. Even if a series is non-stationary, the model needs to predict based on provided data in a local window, and the prediction target is event occurrence. If there is not a reasonable manner in which we can approximately make the global data generating process stationary, then instead our attention should be put towards modeling choices which can help generalize well from local context and learn short-term behavior (e.g. volatility, temporal dynamics) better.
+
+However, some degree of stationarity still remains relevant for the model to establish a logical baseline to detect abrupt spikes, which are likely periods of abnormal activity.
+

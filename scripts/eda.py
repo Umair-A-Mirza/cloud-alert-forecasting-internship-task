@@ -1,9 +1,8 @@
 import pandas as pd
 import numpy as np
-import seaborn as sns
 import matplotlib.pyplot as plt
 import math
-from typing import Dict, List, Tuple, Optional, Any, Callable
+from typing import Dict, List, Tuple
 from statsmodels.graphics.tsaplots import plot_acf, plot_pacf
 from statsmodels.tsa.stattools import adfuller
 from tabulate import tabulate
@@ -137,7 +136,7 @@ def plot_distribution(df: pd.DataFrame, bins: int = 40, title: str = 'Distributi
     axes[0].set_ylabel('Frequency')
 
     axes[1].boxplot(df['value'], vert=False)
-    axes[1].set_title(f'{title} - Boxplot')
+    axes[1].set_title(f'{title} - Box-Plot')
     axes[1].set_xlabel('Value')
 
     plt.tight_layout()
@@ -452,66 +451,6 @@ def plot_lag(
     # We don't need to repeat the legend multiple times.
     handles, labels = axes[0].get_legend_handles_labels()
     fig.legend(handles, labels, loc='upper center', ncol=4)
-    plt.tight_layout()
-    plt.show()
-
-    lagged['anomaly_pair_type'] = 0
-    lagged.loc[
-        (~lagged['in_anomaly_t']) & (lagged['in_anomaly_t_minus_lag']),
-        'anomaly_pair_type'
-    ] = 1
-    lagged.loc[
-        (lagged['in_anomaly_t']) & (~lagged['in_anomaly_t_minus_lag']),
-        'anomaly_pair_type'
-    ] = 2
-    lagged.loc[
-        (lagged['in_anomaly_t']) & (lagged['in_anomaly_t_minus_lag']),
-        'anomaly_pair_type'
-    ] = 3
-
-    normal = lagged[lagged['anomaly_pair_type'] == 0]
-    lag_only_anomalous = lagged[lagged['anomaly_pair_type'] == 1]
-    t_only_anomalous = lagged[lagged['anomaly_pair_type'] == 2]
-    both_anomalous = lagged[lagged['anomaly_pair_type'] == 3]
-
-    _, ax = plt.subplots(figsize=(6, 6))
-
-    ax.scatter(
-        normal[f'{value_col}_t_minus_{lag}'],
-        normal[f'{value_col}_t'],
-        alpha=0.10,
-        s=16,
-        label='Neither anomalous'
-    )
-
-    ax.scatter(
-        lag_only_anomalous[f'{value_col}_t_minus_{lag}'],
-        lag_only_anomalous[f'{value_col}_t'],
-        alpha=0.55,
-        s=22,
-        label=f'Anomalous at t-{lag} only'
-    )
-
-    ax.scatter(
-        t_only_anomalous[f'{value_col}_t_minus_{lag}'],
-        t_only_anomalous[f'{value_col}_t'],
-        alpha=0.55,
-        s=22,
-        label='Anomalous at t only'
-    )
-
-    ax.scatter(
-        both_anomalous[f'{value_col}_t_minus_{lag}'],
-        both_anomalous[f'{value_col}_t'],
-        alpha=0.95,
-        s=30,
-        label='Both anomalous'
-    )
-
-    ax.set_xlabel(f'{value_col}(t-{lag})')
-    ax.set_ylabel(f'{value_col}(t)')
-    ax.set_title(title)
-    ax.legend()
     plt.tight_layout()
     plt.show()
 
